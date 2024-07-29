@@ -1,4 +1,5 @@
 const userModels = require("../models/userModels");
+const bcrypt = require("bcryptjs");
 
 const userController = async (req, res) => {
   try {
@@ -56,9 +57,64 @@ const updateUserController = async (req, res) => {
     res.status().send({
       success: false,
       message: "Failed to update User",
-      error
+      error,
     });
   }
 };
 
-module.exports = { userController, updateUserController };
+//Update User Password
+
+const updateUserPasswordController = async (req, res) => {
+  try {
+    //FIND USER
+    const user = await userModels.findById({ _id: req.body.id });
+
+    //validation
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    //get data from user
+    const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword) {
+      return res.status(500).send({
+        success: false,
+        message: "Please provide Old or new Password",
+      });
+    }
+
+    //check user password || compare password
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(500).send({
+        success: false,
+        message: "Invalid Credentials",
+      });
+    }
+    //hashing password
+    var salt = bcrypt.genSaltSync(10);
+    const hasedPassword = await bcrypt.hash(newPassword, salt);
+    user.password = hasedPassword;
+    await user.save();
+    res.status(200).send({
+      success: true,
+      message: "User password succefully Updated.",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in password Update API",
+      error,
+    });
+  }
+};
+
+module.exports = {
+  userController,
+  updateUserController,
+  updateUserPasswordController,
+};
