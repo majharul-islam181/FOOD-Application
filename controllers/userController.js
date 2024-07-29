@@ -29,6 +29,7 @@ const userController = async (req, res) => {
   }
 };
 
+// UPDATE USER
 const updateUserController = async (req, res) => {
   try {
     //find user
@@ -63,7 +64,6 @@ const updateUserController = async (req, res) => {
 };
 
 //Update User Password
-
 const updateUserPasswordController = async (req, res) => {
   try {
     //FIND USER
@@ -113,8 +113,52 @@ const updateUserPasswordController = async (req, res) => {
   }
 };
 
+//Reset Password
+const resetPasswordController = async (req, res) => {
+  try {
+    const { email, newPassword, answer } = req.body;
+    //validate all field
+    if (!email || !newPassword || !answer) {
+      return res.status(404).send({
+        success: false,
+        message: "Required all field",
+      });
+    }
+
+    //user trac
+    const user = await userModels.findOne({ email, answer });
+    //validate user
+    if (!user) {
+      return res.status(500).send({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    //hasing password
+    var salt = bcrypt.genSaltSync(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    user.password = hashedPassword;
+    await user.save();
+    res.status(200).send({
+        success: true,
+        message: "Password Reset Successfully"
+    })
+
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in Password Reset",
+      error,
+    });
+  }
+};
+
 module.exports = {
   userController,
   updateUserController,
   updateUserPasswordController,
+  resetPasswordController,
 };
