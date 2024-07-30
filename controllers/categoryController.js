@@ -1,5 +1,6 @@
 const categoryModel = require("../models/categoryModel");
 
+//CREATE CATEGORY
 const createCategoryController = async (req, res) => {
   try {
     const { title, imageUrl } = req.body;
@@ -37,4 +38,37 @@ const createCategoryController = async (req, res) => {
   }
 };
 
-module.exports = { createCategoryController };
+//GET ALL CATEGORY
+const getAllCategoryController = async (req, res) =>{
+
+
+    try {
+        //get category
+        const allCategories = await categoryModel.find({});
+        //validate
+        if(!allCategories){
+            return res.status(404).send({
+                success: false,
+                message: "No category found",
+            })
+        }
+        res.status(200).send({
+            success:true,
+            message: "All category found successfully",
+            category: allCategories.length,
+            allCategories,
+        })
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({
+            success: false,
+            message: "Error in Get all category API",
+            error,
+        })
+        
+    }
+
+}
+
+module.exports = { createCategoryController, getAllCategoryController };
