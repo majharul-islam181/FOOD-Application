@@ -3,16 +3,17 @@ const mongoose = require("mongoose");
 //schema
 const resturantSchema = new mongoose.Schema(
   {
-    titile: {
+    title: {
       type: String,
-      required: [true, "Resturant title is required"],
+      required: [true, " Resturant title is required"],
     },
     imageUrl: {
       type: String,
-      required: [true, "Resturant image is required"],
     },
     foods: { type: Array },
-    time: { type: String },
+    time: {
+      type: String,
+    },
     pickup: {
       type: Boolean,
       default: true,
@@ -35,7 +36,9 @@ const resturantSchema = new mongoose.Schema(
       max: 5,
     },
     ratingCount: { type: String },
-    code: { type: String },
+    code: {
+      type: String,
+    },
     coords: {
       id: { type: String },
       latitude: { type: Number },
@@ -49,5 +52,5 @@ const resturantSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
-module.exports = mongoose.model('Resturant',resturantSchema)
+//export
+module.exports = mongoose.model("Resturant", resturantSchema);
