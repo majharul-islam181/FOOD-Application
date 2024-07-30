@@ -4,6 +4,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const rateLimit = require('express-rate-limit');
 
 
 
@@ -18,6 +19,19 @@ connectDB();
 
 //rest object
 const app = express();
+
+
+// Define the rate limit rule
+const limiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute window
+    max: 5, // Limit each IP to 5 requests per windowMs
+    delayMs: 60 * 1000, // Optional: 1 minute delay after max is reached
+    message: "Too many requests from this IP, please try again after a minute."
+  });
+  
+  // Apply the rate limiting middleware to all requests
+  app.use(limiter);
+  
 
 //middleware
 app.use(cors())

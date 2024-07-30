@@ -6,6 +6,8 @@ const resturantSchema = new mongoose.Schema(
     title: {
       type: String,
       required: [true, " Resturant title is required"],
+      unique: [true, "Resturant name should be unique"],
+      trim: true,
     },
     imageUrl: {
       type: String,
@@ -48,9 +50,27 @@ const resturantSchema = new mongoose.Schema(
       address: { type: String },
       title: { type: String },
     },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { timestamps: true }
 );
+
+// Apply the unique index manually if not already applied
+resturantSchema.index({ title: 1 }, { unique: true });
+
+// Ensure indexes are created
+// resturantSchema.on("index", (error) => {
+//   // if (error) console.error("Index creation error:", error);
+//   if (error) {
+//     return res.status(404).send({
+//       success: false,
+//       message: "Name must be Unique",
+//     });
+//   }
+// });
 
 //export
 module.exports = mongoose.model("Resturant", resturantSchema);

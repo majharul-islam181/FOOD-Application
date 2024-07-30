@@ -44,52 +44,91 @@ const createResturantController = async (req, res) => {
     res.status(201).send({
       success: true,
       message: "New Resturant Created successfully",
+      newResturant,
+    });
+  } catch (error) {
+    // console.log(error);
+    if (error.code === 11000) {
+      // Duplicate key error
+      return res
+        .status(400)
+        .json({ message: "Restaurant name should be unique" });
+    } else {
+      res.status(500).send({
+        success: false,
+        message: "Error In Create Resturant api",
+        error,
+      });
+    }
+  }
+};
+
+//ALL RESTURANTS
+const getAllResturantController = async (req, res) => {
+  try {
+    //get resturants
+    const resturants = await resturantModel.find({});
+    //validate
+    if (!resturants) {
+      return res.status(404).send({
+        success: false,
+        message: "No resturants found!",
+      });
+    }
+    res.status(200).send({
+      success: true,
+      message: "Resturants Founds Successfully",
+      totalCount: resturants.length,
+      resturants,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error In Create Resturant api",
+      message: "Error on get all resturants api",
       error,
     });
   }
 };
 
-
-//ALL RESTURANTS
-const getAllResturantController =async(req, res)=>{
+//GET SINGLE RESTURANT
+const getResturantByIdController = async (req, res) => {
   try {
-    //get resturants
-    const resturants = await resturantModel.find({});
-    //validate
-    if(!resturants){
+    //get id
+    const resturantId = req.params.id;
+    //validate id
+    if (!resturantId) {
       return res.status(404).send({
         success: false,
-        message: "No resturants found!"
-      })
+        message: "Please provide resturant Id",
+      });
+    }
+    //get resturant
+    const resturant = await resturantModel.findById(resturantId);
+    //validate
+    if (!resturant) {
+      return res.status(404).send({
+        success: false,
+        message: "No resturant found!",
+      });
     }
     res.status(200).send({
-      success:true,
-      message: "Resturants Founds Successfully",
-      totalCount: resturants.length,
-      resturants
-      
-    })
-    
+      success: true,
+      message: "Resturant found succesfully",
+      resturant,
+    });
   } catch (error) {
-
     console.log(error);
     res.status(500).send({
-      success:false,
-      message: "Error on get all resturants api",
+      success: false,
+      message: "Error in Get Resturant in Id API",
       error,
-    })
-    
+    });
   }
-
-}
+};
 
 module.exports = {
-    createResturantController,
-    getAllResturantController,
-  };
+  createResturantController,
+  getAllResturantController,
+  getResturantByIdController,
+};
