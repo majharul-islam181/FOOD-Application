@@ -39,36 +39,114 @@ const createCategoryController = async (req, res) => {
 };
 
 //GET ALL CATEGORY
-const getAllCategoryController = async (req, res) =>{
+const getAllCategoryController = async (req, res) => {
+  try {
+    //get category
+    const allCategories = await categoryModel.find({});
+    //validate
+    if (!allCategories) {
+      return res.status(404).send({
+        success: false,
+        message: "No category found",
+      });
+    }
+    res.status(200).send({
+      success: true,
+      message: "All category found successfully",
+      totalCategory: allCategories.length,
+      allCategories,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in Get all category API",
+      error,
+    });
+  }
+};
 
+//UPDATE CATEGORY BY ID
+const updateCatController = async (req, res) => {
+  try {
+    //get id
+    const userId = req.params.id;
+    const { title, imageUrl } = req.body;
+    //category
+    const updateCategory = await categoryModel.findByIdAndUpdate(
+      userId,
+      { title, imageUrl },
+      { new: true }
+    );
+    //validate
+    if (!updateCategory) {
+      return res.status(404).send({
+        success: false,
+        message: "Not Category updated",
+      });
+    }
+    await updateCategory.save();
+    res.status(200).send({
+      success: true,
+      message: "Category updated successfully",
+      updateCategory,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in  Update category API",
+      error,
+    });
+  }
+};
 
+//DELETE CATEGORY BY ID
+const deleteCatController = async (req, res) => {
     try {
-        //get category
-        const allCategories = await categoryModel.find({});
-        //validate
-        if(!allCategories){
+        //get id
+        const userId = req.params.id;
+        //validate id
+        if(!id){
             return res.status(404).send({
-                success: false,
-                message: "No category found",
+                success:false
+                ,
+                message: "Please Provide id",
             })
         }
+        //get category
+        const deleteCatagory = await categoryModel.findByIdAndDelete(userId);
+        if(!deleteCatagory){
+            return res.status(404).send({
+                success: false,
+                message: "No Category found."
+            })
+        };
+
+        const allCategories = await categoryModel.find({})
+
         res.status(200).send({
-            success:true,
-            message: "All category found successfully",
-            category: allCategories.length,
+            success: true,
+            message: "Category deleted successfully",
+            totalCategory: allCategories.length,
             allCategories,
+            
         })
+
         
     } catch (error) {
         console.log(error);
-        res.status(500).send({
-            success: false,
-            message: "Error in Get all category API",
-            error,
-        })
+    res.status(500).send({
+      success: false,
+      message: "Error in  Delete category API",
+      error,
+    });
         
     }
-
-}
-
-module.exports = { createCategoryController, getAllCategoryController };
+};
+module.exports = {
+  createCategoryController,
+  getAllCategoryController,
+  updateCatController,
+  deleteCatController,
+};
