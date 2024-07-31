@@ -1,5 +1,6 @@
 const foodModel = require("../models/foodModel");
 const foodSchema = require("../models/foodModel");
+const orderModel = require("../models/orderModel");
 
 //CREATE FOOD
 const createFoodController = async (req, res) => {
@@ -250,6 +251,105 @@ const deleteFoodController = async (req, res) => {
   }
 };
 
+// const placeOrderController = async (req, res) =>{
+
+//     try {
+//         const {cart} = req.body;
+//         if(!cart){
+//             res.status(404).send({
+//                 success: false,
+//                 message: "No food in this cart.",
+//               });
+//         };
+
+//         let total = 0;
+//          cart.map((i)=>{
+//             total += i.price
+            
+//          })
+//     //     let total = 0;
+//     // cart.forEach((item) => {
+//     //   if (item.price && !isNaN(item.price)) {
+//     //     total += item.price;
+//     //   }
+//     // });
+
+//          const newOrder = new orderModel({
+//             foods: cart,
+//             payment: total,
+//             buyer: req.body.id,
+//          })
+//          await newOrder.save();
+//          res.status(200).send({
+//             success: true,
+//             message: "Order place successfully",
+//             newOrder,
+//           });
+        
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).send({
+//           success: false,
+//           message: "Error in Place Order Food APi",
+//         });
+        
+//     }
+
+// }
+
+const placeOrderController = async (req, res) => {
+    try {
+      const { cart, buyerId } = req.body;
+  
+      // Check if cart is provided and not empty
+      if (!cart || cart.length === 0) {
+        return res.status(404).send({
+          success: false,
+          message: "No food in this cart.",
+        });
+      }
+    //   if(!buyerId){
+    //     return res.status(404).send({
+    //         success: false,
+    //         message: "Buyer id required",
+    //       });
+
+    //   }
+  
+      // Calculate total payment
+      let total = 0;
+      cart.forEach((item) => {
+        if (item.price && !isNaN(item.price)) {
+          total += Number(item.price); 
+        }
+      });
+  
+      // Create new order
+      const newOrder = new orderModel({
+        foods: cart.map(item => item._id), 
+        payment: total, 
+        buyer: req.body.id, 
+      });
+  
+      // Save the order
+      await newOrder.save();
+  
+      // Send response
+      res.status(200).send({
+        success: true,
+        message: "Order placed successfully",
+        newOrder,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send({
+        success: false,
+        message: "Error in Place Order API",
+      });
+    }
+  };
+  
+
 module.exports = {
   createFoodController,
   getFoodByIdController,
@@ -257,4 +357,5 @@ module.exports = {
   getFoodByResturantController,
   updateFoodController,
   deleteFoodController,
+  placeOrderController
 };
