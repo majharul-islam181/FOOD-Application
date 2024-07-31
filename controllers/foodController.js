@@ -133,4 +133,47 @@ const getAllFoodController = async (req, res) =>{
 
 }
 
-module.exports = { createFoodController , getFoodByIdController,getAllFoodController};
+
+//GET  FOODS BY  RESTURANT ID
+const getFoodByResturantController = async( req, res) =>{
+
+    try {
+    //get id
+    const resturantId = req.params.id;
+    //validate id
+    if(!resturantId){
+        return res.status(404).send({
+            success: false,
+            message: "Food id is required."
+        })
+    }
+    //get food
+    const resturant_food = await foodModel.find({resturant: resturantId});
+    //validate
+    if(!resturant_food){
+        return res.status(404).send({
+            success: false,
+            message: "No food found!"
+        })
+    }
+    res.status(200).send({
+        success: true,
+        message: "Food By resturant found successfully",
+    
+        resturant: resturant_food,
+    })
+        
+    } catch (error) {
+        console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in Resturant Food APi",
+    });
+        
+    }
+
+}
+
+
+
+module.exports = { createFoodController , getFoodByIdController,getAllFoodController,getFoodByResturantController};
