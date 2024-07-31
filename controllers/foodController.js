@@ -233,13 +233,13 @@ const deleteFoodController = async (req, res) => {
       return res
         .status(404)
         .send({ success: false, message: "No food found." });
-        await foodModel.findByIdAndDelete(foodId);
+    await foodModel.findByIdAndDelete(foodId);
 
-   const updateFood = await foodModel.find({});
+    const updateFood = await foodModel.find({});
     res.status(200).send({
       success: true,
       message: "Deleted successfully",
-      totalFoods : updateFood.length,
+      totalFoods: updateFood.length,
       updateFood: updateFood,
     });
   } catch (error) {
@@ -265,7 +265,7 @@ const deleteFoodController = async (req, res) => {
 //         let total = 0;
 //          cart.map((i)=>{
 //             total += i.price
-            
+
 //          })
 //     //     let total = 0;
 //     // cart.forEach((item) => {
@@ -285,29 +285,29 @@ const deleteFoodController = async (req, res) => {
 //             message: "Order place successfully",
 //             newOrder,
 //           });
-        
+
 //     } catch (error) {
 //         console.log(error);
 //         res.status(500).send({
 //           success: false,
 //           message: "Error in Place Order Food APi",
 //         });
-        
+
 //     }
 
 // }
 
 const placeOrderController = async (req, res) => {
-    try {
-      const { cart, buyerId } = req.body;
-  
-      // Check if cart is provided and not empty
-      if (!cart || cart.length === 0) {
-        return res.status(404).send({
-          success: false,
-          message: "No food in this cart.",
-        });
-      }
+  try {
+    const { cart, buyerId } = req.body;
+
+    // Check if cart is provided and not empty
+    if (!cart || cart.length === 0) {
+      return res.status(404).send({
+        success: false,
+        message: "No food in this cart.",
+      });
+    }
     //   if(!buyerId){
     //     return res.status(404).send({
     //         success: false,
@@ -315,40 +315,64 @@ const placeOrderController = async (req, res) => {
     //       });
 
     //   }
-  
-      // Calculate total payment
-      let total = 0;
-      cart.forEach((item) => {
-        if (item.price && !isNaN(item.price)) {
-          total += Number(item.price); 
-        }
-      });
-  
-      // Create new order
-      const newOrder = new orderModel({
-        foods: cart.map(item => item._id), 
-        payment: total, 
-        buyer: req.body.id, 
-      });
-  
-      // Save the order
-      await newOrder.save();
-  
-      // Send response
-      res.status(200).send({
-        success: true,
-        message: "Order placed successfully",
-        newOrder,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(500).send({
-        success: false,
-        message: "Error in Place Order API",
-      });
+
+    // Calculate total payment
+    let total = 0;
+    cart.forEach((item) => {
+      if (item.price && !isNaN(item.price)) {
+        total += Number(item.price);
+      }
+    });
+
+    // Create new order
+    const newOrder = new orderModel({
+      foods: cart.map((item) => item._id),
+      payment: total,
+      buyer: req.body.id,
+    });
+
+    // Save the order
+    await newOrder.save();
+
+    // Send response
+    res.status(200).send({
+      success: true,
+      message: "Order placed successfully",
+      newOrder,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in Place Order API",
+    });
+  }
+};
+
+const orderStatusController = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    if(!orderId) {
+        return res.status(404).send({
+            success: false,
+            message: "Please provide valid order id",
+          });
     }
-  };
-  
+    const {status} = req.body;
+    const order = await orderModel.findByIdAndUpdate(orderId,{status},{new: true});
+    res.status(200).send({
+        success: true,
+        message: "Order Status Updated",
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in Order Status API",
+    });
+  }
+
+};
 
 module.exports = {
   createFoodController,
@@ -357,5 +381,6 @@ module.exports = {
   getFoodByResturantController,
   updateFoodController,
   deleteFoodController,
-  placeOrderController
+  placeOrderController,
+  orderStatusController,
 };
