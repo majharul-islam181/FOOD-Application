@@ -1,6 +1,6 @@
 const express = require("express");
 const authMiddleware = require("../middlewares/authMiddleware");
-const { createFoodController, getFoodByIdController, getAllFoodController, getFoodByResturantController } = require("../controllers/foodController");
+const { createFoodController, getFoodByIdController, getAllFoodController, getFoodByResturantController, updateFoodController } = require("../controllers/foodController");
 
 const router = express.Router();
 
@@ -17,6 +17,9 @@ router.get('/getFood/:id', getFoodByIdController)
 
 //GET FOOD BY RESTURANT
 router.get('/getByResturant/:id',getFoodByResturantController)
+
+//UPDATE FOOD
+router.put('/update/:id', authMiddleware, updateFoodController)
 
 
 module.exports = router;
