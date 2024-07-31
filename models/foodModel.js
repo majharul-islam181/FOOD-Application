@@ -60,7 +60,7 @@ const foodSchema = new mongoose.Schema(
 );
 
 // Apply the unique index manually if not already applied
-foodSchema.index({ title: 1 }, { unique: true });
+// foodSchema.index({ title: 1 }, { unique: true });
 
 //export
 module.exports = mongoose.model("food", foodSchema);
