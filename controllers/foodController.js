@@ -218,10 +218,43 @@ const updateFoodController = async (req, res) => {
   }
 };
 
+const deleteFoodController = async (req, res) => {
+  try {
+    //get id
+    const foodId = req.params.id;
+    if (!foodId)
+      return res
+        .status(404)
+        .send({ success: false, message: "Please Provide id" });
+
+    const food = await foodModel.findById(foodId);
+    if (!food)
+      return res
+        .status(404)
+        .send({ success: false, message: "No food found." });
+        await foodModel.findByIdAndDelete(foodId);
+
+   const updateFood = await foodModel.find({});
+    res.status(200).send({
+      success: true,
+      message: "Deleted successfully",
+      totalFoods : updateFood.length,
+      updateFood: updateFood,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in Delete Food APi",
+    });
+  }
+};
+
 module.exports = {
   createFoodController,
   getFoodByIdController,
   getAllFoodController,
   getFoodByResturantController,
   updateFoodController,
+  deleteFoodController,
 };
